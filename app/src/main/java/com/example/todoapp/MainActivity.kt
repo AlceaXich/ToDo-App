@@ -1,11 +1,24 @@
 package com.example.todoapp
 
 import android.os.Bundle
+import android.widget.EditText
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.todoapp.data.Task
+import com.example.todoapp.ui.theme.TaskAdapter
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 
 class MainActivity : AppCompatActivity() {
+
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var taskAdapter: TaskAdapter
+    private val tasks = mutableListOf<Task>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -14,5 +27,36 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar) //convierte el Toolbar en la ActionBar
         supportActionBar?.title = "To Do App"
         //supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        recyclerView = findViewById(R.id.recyclerView)
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        taskAdapter = TaskAdapter(tasks)
+        recyclerView.adapter = taskAdapter
+
+        val fab = findViewById<FloatingActionButton>(R.id.fab)
+        fab.setOnClickListener {
+            showAddTaskDialog()
+        }
+    }
+
+    private fun showAddTaskDialog() {
+        val input = EditText(this)
+        val dialog = AlertDialog.Builder(this)
+            .setTitle("Nueva tarea")
+            .setView(input)
+            .setPositiveButton("Agregar") { _, _ ->
+                val taskTitle = input.text.toString()
+                if (taskTitle.isNotEmpty()) {
+                    val task = Task(taskTitle, taskTitle)
+                    taskAdapter.addTask(task)
+                } else {
+                    Toast.makeText(this, "La tarea no puede estar vacía", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton("Cancelar", null)
+            .create()
+
+        dialog.show()
     }
 }
+
