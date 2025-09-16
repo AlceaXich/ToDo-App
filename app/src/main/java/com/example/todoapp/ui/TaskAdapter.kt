@@ -14,7 +14,7 @@ class TaskAdapter(
     RecyclerView.Adapter<TaskAdapter.TaskViewHolder>() {
 
     class TaskViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val tvTaskTitle: TextView = itemView.findViewById(R.id.tvTaskTitle)
+        val tvTaskTitle: TextView = itemView.findViewById(R.id.tvTask)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
