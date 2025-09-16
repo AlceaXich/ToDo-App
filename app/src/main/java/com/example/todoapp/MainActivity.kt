@@ -8,9 +8,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.todoapp.data.AppDatabase
 import com.example.todoapp.data.Task
 import com.example.todoapp.ui.theme.TaskAdapter
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 class MainActivity : AppCompatActivity() {
@@ -18,6 +22,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var taskAdapter: TaskAdapter
     private val tasks = mutableListOf<Task>()
+
+    private val db by lazy { AppDatabase.getDatabase(this) }
+    private val taskDao by lazy { db.taskDao()}
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,9 +40,22 @@ class MainActivity : AppCompatActivity() {
         taskAdapter = TaskAdapter(tasks)
         recyclerView.adapter = taskAdapter
 
+        loadTasksFromDb()
+
         val fab = findViewById<FloatingActionButton>(R.id.fab)
         fab.setOnClickListener {
             showAddTaskDialog()
+        }
+    }
+
+    private fun loadTasksFromDb() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val dbTasks = taskDao.getAllTasks()
+            runOnUiThread {
+                tasks.clear()
+                tasks.addAll(dbTasks)
+                taskAdapter.notifyDataSetChanged()
+            }
         }
     }
 
@@ -47,8 +67,11 @@ class MainActivity : AppCompatActivity() {
             .setPositiveButton("Agregar") { _, _ ->
                 val taskTitle = input.text.toString()
                 if (taskTitle.isNotEmpty()) {
-                    val task = Task(taskTitle, taskTitle)
-                    taskAdapter.addTask(task)
+                    val task = Task(title = taskTitle, content = taskTitle, done = false)
+                    CoroutineScope(Dispatchers.IO).launch {
+                        taskDao.insertTask(task)
+                        loadTasksFromDb()
+                    }
                 } else {
                     Toast.makeText(this, "La tarea no puede estar vacía", Toast.LENGTH_SHORT).show()
                 }

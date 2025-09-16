@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:padding="8dp"
     android:layout_marginBottom="8dp"
+    android:gravity="center_vertical"
     android:background="@drawable/background_task">
 
     <CheckBox
@@ -17,5 +19,15 @@
         android:textStyle="bold"
         android:fontFamily="sans-serif-medium"
         android:textSize="16sp"
-        android:maxLines="1"/>
+        android:maxLines="1"
+        android:buttonTint="@color/purple_200" />
+
+    <ImageView
+        android:id="@+id/btnDelete"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:src="@android:drawable/ic_menu_delete"
+        android:contentDescription="Eliminar tarea"
+        android:padding="4dp"
+        app:tint="@color/purple_200" />
 </LinearLayout>
