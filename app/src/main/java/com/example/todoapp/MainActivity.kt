@@ -45,13 +45,13 @@ class MainActivity : AppCompatActivity() {
                 lifecycleScope.launch(Dispatchers.IO) {
                     taskDao.updateTask(task)
                 }
-            }
-            /*onTaskDeleted = { task ->
+            },
+            onTaskDeleted = { task ->
                 lifecycleScope.launch(Dispatchers.IO) {
                     taskDao.deleteTask(task)
                     loadTasksFromDb()
                 }
-            }*/
+            }
         )
         recyclerView.adapter = taskAdapter
 
