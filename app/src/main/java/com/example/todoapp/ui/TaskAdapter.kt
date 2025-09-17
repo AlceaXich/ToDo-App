@@ -3,18 +3,19 @@ package com.example.todoapp.ui.theme
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CheckBox
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.todoapp.R
 import com.example.todoapp.data.Task
 
 class TaskAdapter(
-    private val tasks: MutableList<Task>
-) :
-    RecyclerView.Adapter<TaskAdapter.TaskViewHolder>() {
+    private val tasks: MutableList<Task>,
+    private val onTaskChecked: (Task) -> Unit
+) :  RecyclerView.Adapter<TaskAdapter.TaskViewHolder>() {
 
     class TaskViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val tvTaskTitle: TextView = itemView.findViewById(R.id.tvTask)
+        val tvTaskTitle: CheckBox = itemView.findViewById(R.id.tvTask)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
@@ -24,7 +25,16 @@ class TaskAdapter(
     }
 
     override fun onBindViewHolder(holder: TaskViewHolder, position: Int) {
-        holder.tvTaskTitle.text = tasks[position].title
+        val task = tasks[position]
+        holder.tvTaskTitle.text = task.title
+        holder.tvTaskTitle.isChecked = task.done
+
+        holder.tvTaskTitle.setOnCheckedChangeListener(null)
+        holder.tvTaskTitle.isChecked = task.done
+        holder.tvTaskTitle.setOnCheckedChangeListener { _, isChecked ->
+            task.done = isChecked
+            onTaskChecked(task)
+        }
     }
 
     override fun getItemCount(): Int = tasks.size
@@ -32,5 +42,11 @@ class TaskAdapter(
     fun addTask(task: Task) {
         tasks.add(task)
         notifyItemInserted(tasks.size - 1)
+    }
+
+    fun setTasks(newTask: List<Task>) {
+        tasks.clear()
+        tasks.addAll(newTask)
+        notifyDataSetChanged()
     }
 }

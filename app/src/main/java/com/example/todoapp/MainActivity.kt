@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.todoapp.data.AppDatabase
@@ -15,33 +16,49 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var taskAdapter: TaskAdapter
-    private val tasks = mutableListOf<Task>()
 
     private val db by lazy { AppDatabase.getDatabase(this) }
-    private val taskDao by lazy { db.taskDao()}
+    private val taskDao by lazy { db.taskDao() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // Configurar Toolbar
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
-        setSupportActionBar(toolbar) //convierte el Toolbar en la ActionBar
+        setSupportActionBar(toolbar)
         supportActionBar?.title = "To Do App"
-        //supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
+        // Configurar RecyclerView
         recyclerView = findViewById(R.id.recyclerView)
         recyclerView.layoutManager = LinearLayoutManager(this)
-        taskAdapter = TaskAdapter(tasks)
+        taskAdapter = TaskAdapter(
+            tasks = mutableListOf(),
+            onTaskChecked = { task ->
+                lifecycleScope.launch(Dispatchers.IO) {
+                    taskDao.updateTask(task)
+                }
+            }
+            /*onTaskDeleted = { task ->
+                lifecycleScope.launch(Dispatchers.IO) {
+                    taskDao.deleteTask(task)
+                    loadTasksFromDb()
+                }
+            }*/
+        )
         recyclerView.adapter = taskAdapter
 
+        // Cargar tareas desde BD
         loadTasksFromDb()
 
+        // Configurar FAB
         val fab = findViewById<FloatingActionButton>(R.id.fab)
         fab.setOnClickListener {
             showAddTaskDialog()
@@ -49,12 +66,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadTasksFromDb() {
-        CoroutineScope(Dispatchers.IO).launch {
+        lifecycleScope.launch(Dispatchers.IO) {
             val dbTasks = taskDao.getAllTasks()
-            runOnUiThread {
-                tasks.clear()
-                tasks.addAll(dbTasks)
-                taskAdapter.notifyDataSetChanged()
+            withContext(Dispatchers.Main) {
+                taskAdapter.setTasks(dbTasks)
             }
         }
     }
@@ -68,7 +83,7 @@ class MainActivity : AppCompatActivity() {
                 val taskTitle = input.text.toString()
                 if (taskTitle.isNotEmpty()) {
                     val task = Task(title = taskTitle, content = taskTitle, done = false)
-                    CoroutineScope(Dispatchers.IO).launch {
+                    lifecycleScope.launch(Dispatchers.IO) {
                         taskDao.insertTask(task)
                         loadTasksFromDb()
                     }
