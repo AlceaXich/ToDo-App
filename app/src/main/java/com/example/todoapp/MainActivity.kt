@@ -13,7 +13,6 @@ import com.example.todoapp.data.AppDatabase
 import com.example.todoapp.data.Task
 import com.example.todoapp.ui.theme.TaskAdapter
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

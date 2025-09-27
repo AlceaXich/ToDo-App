@@ -1,11 +1,13 @@
 package com.example.todoapp.ui.theme
 
+import android.content.Context
 import android.graphics.Paint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.ImageView
+import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
 import com.example.todoapp.R
 import com.example.todoapp.data.Task
@@ -19,6 +21,17 @@ class TaskAdapter(
     class TaskViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val tvTaskTitle: CheckBox = itemView.findViewById(R.id.tvTask)
         val btnDelete: ImageView = itemView.findViewById(R.id.btnDelete)
+    }
+
+    private fun showDeleteTaskDialog(task: Task, context: Context) {
+        AlertDialog.Builder(context)
+            .setTitle("Eliminar tarea")
+            .setMessage("Esta seguro de eliminar la tarea?")
+            .setPositiveButton("Eliminar") { _, _, ->
+                onTaskDeleted(task)
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
@@ -58,7 +71,7 @@ class TaskAdapter(
 
         //Boton Eliminar
         holder.btnDelete.setOnClickListener {
-            onTaskDeleted(task)
+            showDeleteTaskDialog(task, holder.tvTaskTitle.context)
         }
     }
 
