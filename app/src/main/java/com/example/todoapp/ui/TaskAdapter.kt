@@ -1,11 +1,11 @@
 package com.example.todoapp.ui.theme
 
+import android.graphics.Paint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.ImageView
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.todoapp.R
 import com.example.todoapp.data.Task
@@ -30,13 +30,30 @@ class TaskAdapter(
     override fun onBindViewHolder(holder: TaskViewHolder, position: Int) {
         val task = tasks[position]
         holder.tvTaskTitle.text = task.title
+
+        // Evitar que se dispare en cada bind
+        holder.tvTaskTitle.setOnCheckedChangeListener(null)
+
+        // Seteamos el estado actual
         holder.tvTaskTitle.isChecked = task.done
 
-        holder.tvTaskTitle.setOnCheckedChangeListener(null)
-        holder.tvTaskTitle.isChecked = task.done
+        // Aplicamos tachado según estado
+        holder.tvTaskTitle.paintFlags = if (task.done) {
+            holder.tvTaskTitle.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+        } else {
+            holder.tvTaskTitle.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+        }
+
         holder.tvTaskTitle.setOnCheckedChangeListener { _, isChecked ->
             task.done = isChecked
             onTaskChecked(task)
+
+            // Aquí actualizamos el tachado en tiempo real
+            holder.tvTaskTitle.paintFlags = if (isChecked) {
+                holder.tvTaskTitle.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+            } else {
+                holder.tvTaskTitle.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+            }
         }
 
         //Boton Eliminar
