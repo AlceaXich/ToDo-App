@@ -6,7 +6,7 @@ Una aplicación de lista de tareas moderna desarrollada en Android con Kotlin, u
 
 ### 📱 Demostración de la Aplicación
 
-![Demo de la ToDo App](app-video.gif)
+<img src="app-video.gif" alt="Demo de la ToDo App" width="300" height="600">
 
 *Demostración de las funcionalidades principales de la ToDo App*
 
@@ -234,11 +234,3 @@ app/build/outputs/apk/debug/app-debug.apk
 ## 👨‍💻 Autor
 
 Desarrollado con ❤️ usando las mejores prácticas de Android development.
-
-## 📞 Contacto
-
-Para preguntas o sugerencias, no dudes en abrir un issue en el repositorio.
-
----
-
-**¡Gracias por usar ToDo App! 🎉**
